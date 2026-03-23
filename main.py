@@ -3,6 +3,7 @@ from discord.ext import commands
 import os
 import asyncio
 import logging
+import groq
 from datetime import datetime, timedelta
 from typing import Dict, List
 
@@ -230,8 +231,9 @@ if __name__ == '__main__':
     intents = discord.Intents.default()
     intents.messages, intents.members, intents.presences, intents.message_content = True, True, True, True
     bot = NSTA(command_prefix='!', intents=intents)
+    groq_client = groq.Groq(api_key=groq_api_key)
     if not token:
         raise ValueError('DISCORD_TOKEN not set in environment variables')
-
+    bot.groq_client = groq_client
     # Запуск бота
     bot.run(token, log_level=logging.INFO)
