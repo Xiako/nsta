@@ -228,20 +228,10 @@ if __name__ == '__main__':
 
     # Настройка интентов
     intents = discord.Intents.default()
-    intents.messages = True
-    intents.message_content = True  # обязательно для чтения сообщений
-    intents.members = True
-    intents.presences = True
-
-    # Создание бота
+    intents.messages, intents.members, intents.presences, intents.message_content = True, True, True, True
     bot = NSTA(command_prefix='!', intents=intents)
-
-intents = discord.Intents.default()
-intents.messages, intents.members, intents.presences = True, True, True
-bot = NSTA(command_prefix='!', intents=intents)
-token = os.getenv('DISCORD_TOKEN')
-if not token:
-    raise ValueError('DISCORD_TOKEN not set in environment variables')
+    if not token:
+        raise ValueError('DISCORD_TOKEN not set in environment variables')
 
     # Запуск бота
     bot.run(token, log_level=logging.INFO)
