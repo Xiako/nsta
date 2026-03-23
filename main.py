@@ -3,7 +3,6 @@ from discord.ext import commands
 import os
 import asyncio
 import logging
-import groq
 from datetime import datetime, timedelta
 
 class NSTA(commands.Bot):
@@ -28,7 +27,6 @@ class NSTA(commands.Bot):
         async def on_message(msg):
             pass
 
-client = groq.Groq(api_key=os.getenv('GROQ_API_KEY'))
 intents = discord.Intents.default()
 intents.messages, intents.members, intents.presences = True, True, True
 bot = NSTA(command_prefix='!', intents=intents)
