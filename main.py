@@ -1,12 +1,10 @@
-from threading import Thread
 import discord
 from discord.ext import commands
-import json
-import requests
-import random
 import os
 import asyncio
 import logging
+import groq
+from datetime import datetime, timedelta
 
 class NSTA(commands.Bot):
 
@@ -30,7 +28,10 @@ class NSTA(commands.Bot):
         async def on_message(msg):
             pass
 
-bot = NSTA(command_prefix='!', intents=discord.Intents.all())
+client = groq.Groq(api_key=os.getenv('GROQ_API_KEY'))
+intents = discord.Intents.default()
+intents.messages, intents.members, intents.presences = True, True, True
+bot = NSTA(command_prefix='!', intents=intents)
 token = os.getenv('DISCORD_TOKEN')
 if not token:
     raise ValueError('DISCORD_TOKEN not set in environment variables')
