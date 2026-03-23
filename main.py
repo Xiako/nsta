@@ -30,9 +30,12 @@ class NSTA(commands.Bot):
 
         @self.tree.command(name='kill', description='Остановить бота')
         async def kill(interaction: discord.Interaction):
-            await interaction.response.send_message("Выключаюсь...")
-            await self.close()
-            exit()
+            if interaction.user.id == 308969326764097547:
+                await interaction.response.send_message("Выключаюсь...")
+                await self.close()
+                exit()
+            else:
+                await interaction.response.send_message("Не лапай меня, дурак!!")
 
         @self.tree.command(name='ask', description='Задать вопрос Groq AI')
         async def ask(interaction: discord.Interaction, question: str):
