@@ -1,11 +1,12 @@
 import discord
 from discord.ext import commands
 import os
+import sys
 import asyncio
 import logging
 import groq
-from datetime import datetime, timedelta
 from typing import Dict, List
+logging.basicConfig(level=logging.INFO)
 
 # Конфигурация Groq
 MODEL_NAME = os.getenv("MODEL_NAME")  # или "mixtral-8x7b-32768", "llama3-8b-8192"
@@ -30,6 +31,7 @@ class NSTA(commands.Bot):
 
         @self.tree.command(name='kill', description='Остановить бота')
         async def kill(interaction: discord.Interaction):
+            logging.debug(f"Команда /kill вызвана пользователем {interaction.user.global_name}, id: {interaction.user.id}")
             if interaction.user.id == 308969326764097547:
                 await interaction.response.send_message("Выключаюсь...")
                 await self.close()
@@ -59,6 +61,7 @@ class NSTA(commands.Bot):
 
         @self.tree.command(name='clear', description='Очистить историю диалога')
         async def clear(interaction: discord.Interaction):
+            logging.debug(f"Пользователь {interaction.user.global_name} очистил историю диалога")
             """Slash-команда /clear"""
             self.clear_history(interaction.channel_id, interaction.user.id)
             await interaction.response.send_message("🧹 История нашего диалога очищена.", ephemeral=True)
@@ -172,13 +175,13 @@ class NSTA(commands.Bot):
 
     async def on_ready(self):
         """Событие при запуске бота"""
-        print(f"✅ Бот {self.user} готов")
-        print(f"📊 Groq модель: {MODEL_NAME}")
-        print(f"📝 История: {MAX_HISTORY} сообщений")
+        logging.info(f"✅ Бот {self.user} готов")
+        logging.info(f"📊 Groq модель: {MODEL_NAME}")
+        logging.info(f"📝 История: {MAX_HISTORY} сообщений")
 
         # Синхронизация slash-команд
         await self.tree.sync()
-        print("✅ Slash-команды синхронизированы")
+        logging.info("✅ Slash-команды синхронизированы")
 
     async def on_message(self, message: discord.Message):
         """Обработка всех сообщений"""
@@ -188,6 +191,7 @@ class NSTA(commands.Bot):
 
         # Если бота упомянули — отвечаем
         if self.user in message.mentions:
+            logging.debug("Бота упомянули")
             # Убираем упоминание из текста
             content = message.content
             for mention in message.mentions:
@@ -214,6 +218,7 @@ class NSTA(commands.Bot):
 
     async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState,
                                     after: discord.VoiceState):
+        logging.debug("Голосовое состояние изменено")
         """Событие при изменении голосового состояния (пока пустое)"""
         pass
 
@@ -221,22 +226,24 @@ class NSTA(commands.Bot):
 # ========== Запуск бота ==========
 
 if __name__ == '__main__':
-    # Получаем токены из переменных окружения
+
+    logging.debug("Получаю токены из переменных окружения")
     token = os.getenv('DISCORD_TOKEN')
     groq_api_key = os.getenv('GROQ_API_KEY')
-
     if not token:
-        raise ValueError('DISCORD_TOKEN not set in environment variables')
+        logging.critical("DISCORD_TOKEN не установлен в переменных окружения!")
+        sys.exit(1)
     if not groq_api_key:
-        raise ValueError('GROQ_API_KEY not set in environment variables')
+        logging.critical("GROQ_API_KEY не установлен в переменных окружения!")
+        sys.exit(1)
+    logging.debug("Токены успешно получены")
 
     # Настройка интентов
     intents = discord.Intents.default()
     intents.messages, intents.members, intents.presences, intents.message_content = True, True, True, True
+    logging.debug("Интенты настроены")
     bot = NSTA(command_prefix='!', intents=intents)
     groq_client = groq.Groq(api_key=groq_api_key)
-    if not token:
-        raise ValueError('DISCORD_TOKEN not set in environment variables')
     bot.groq_client = groq_client
-    # Запуск бота
+    logging.debug("Бот создан, запускаю")
     bot.run(token, log_level=logging.INFO)
