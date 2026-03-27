@@ -116,7 +116,7 @@ class NSTA(commands.Bot):
             user_id: int,
             user_name: str,
             temperature: float = 0.7,
-            max_tokens: int = 500
+            max_tokens: int = 300
 
     ) -> str:
         """
